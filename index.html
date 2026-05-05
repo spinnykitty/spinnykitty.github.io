@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Spinning Cat Speaker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,500;0,700;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --border: #1e1e2e;
+      --accent: #7f5af0;
+      --accent2: #2cb67d;
+      --accent3: #ff6b6b;
+      --text: #fffffe;
+      --muted: #72727a;
+      --mono: 'Space Mono', monospace;
+      --body: 'DM Sans', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 6vw 60px;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 40%, rgba(127,90,240,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(44,182,125,0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 40px;
+    }
+    
+    .hero-photo {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    
+    .hero-photo img {
+      width: 100%;
+      display: block;
+      object-fit: cover;
+    }
+    
+    /* Stack vertically on small screens */
+    @media (max-width: 700px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+      }
+      .hero-photo {
+        order: -1; /* photo appears above title on mobile */
+      }
+    }
+    .tag {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--accent2);
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tag::before {
+      content: '';
+      width: 30px; height: 1px;
+      background: var(--accent2);
+      display: inline-block;
+    }
+
+    h1 {
+      font-family: var(--mono);
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
+    }
+    h1 span {
+      background: linear-gradient(135deg, var(--accent) 0%, #cb67ff 50%, var(--accent3) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 36px;
+    }
+
+    .team-pill {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pill {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      padding: 5px 14px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── MEDIA GRID TOP ── */
+    .media-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 0 6vw;
+      margin-bottom: 20px;
+    }
+
+    .media-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .media-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      text-transform: uppercase;
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .img-placeholder {
+      width: 100%;
+      aspect-ratio: 16/10;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+    }
+
+    .img-placeholder img,
+    .img-placeholder-real {
+      width: 100%;
+      aspect-ratio: 16/10;
+      object-fit: cover;
+      display: block;
+    }
+
+    .cat-icon {
+      font-size: 3rem;
+      opacity: 0.3;
+    }
+
+    .video-wrap {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #000;
+    }
+    .video-wrap video,
+    .video-wrap iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: none;
+    }
+
+    /* ── MEDIA BOTTOM ROW ── */
+    .media-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 0 6vw;
+      margin-bottom: 70px;
+    }
+
+    .pdf-wrap {
+      width: 100%;
+      height: 520px;
+      background: #000;
+    }
+    .pdf-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .pdf-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: linear-gradient(135deg, #1a1a2e, #0a0a1a);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+    }
+    .pdf-icon { font-size: 2.5rem; }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 10px 22px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      transition: opacity 0.2s;
+    }
+    .download-btn:hover { opacity: 0.8; }
+
+    /* ── CONTENT SECTIONS ── */
+    .content {
+      padding: 0 6vw 100px;
+      max-width: 1100px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 60px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .section-num {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+    }
+    h2 {
+      font-family: var(--mono);
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    h3 {
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 12px;
+      margin-top: 32px;
+    }
+
+    p { color: #c4c4cc; margin-bottom: 16px; max-width: 680px; }
+
+    /* ── FEATURE LIST ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      margin-bottom: 50px;
+    }
+    .feature-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .feature-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent2);
+      margin-top: 8px;
+      flex-shrink: 0;
+    }
+    .feature-text { font-size: 0.9rem; color: #c4c4cc; }
+
+    /* ── ARCH SECTION ── */
+    .arch-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    .arch-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+    }
+    .arch-card h3 { margin-top: 0; }
+    .arch-card p { font-size: 0.9rem; max-width: none; }
+
+    /* ── COMPONENT TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+      margin-bottom: 50px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    thead th {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: var(--surface); }
+    tbody td {
+      padding: 13px 16px;
+      color: #c4c4cc;
+    }
+    tbody td:first-child {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+
+    /* ── POWER ── */
+    .power-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 14px 24px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+    .power-icon { font-size: 1.4rem; }
+
+    /* ── DIAGRAM ── */
+    .diagram-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 50px;
+    }
+    .diagram-card img {
+      width: 100%;
+      display: block;
+    }
+    .diagram-placeholder {
+      padding: 60px;
+      text-align: center;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 30px 6vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-names { display: flex; gap: 16px; flex-wrap: wrap; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .media-top, .media-bottom, .arch-cols { grid-template-columns: 1fr; }
+      .media-top, .media-bottom { padding: 0 4vw; }
+      .content { padding: 0 4vw 60px; }
+      .hero { padding: 60px 4vw 40px; }
+    }
+
+    /* ── SCROLL FADE IN ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="tag">ELEC 327 Final Project</div>
+        <h1>Spinny<br><span>Kitty Committee</span></h1>
+        <p class="hero-sub">
+          A rhythm-synchronized speaker system featuring a 3D-printed cat that spins
+          and flashes RGB LEDs in time with music.
+        </p>
+        <div class="team-pill">
+          <span class="pill">Katherine Han</span>
+          <span class="pill">Evan Ho</span>
+          <span class="pill">Hajime Kioi</span>
+          <span class="pill">Winson Lin</span>
+        </div>
+      </div>
+  
+      <div class="hero-photo">
+        <img src="titlephoto.jpg" alt="Spinning Cat Speaker" />
+      </div>
+    </div>
+  </section>
+
+  <!-- TOP MEDIA: Photo + Video 1 -->
+  <div class="media-top fade-in">
+    <div class="media-card">
+      <div class="media-label">📷 &nbsp;Project Photo</div>
+      <!-- Replace src with your actual image file, e.g. src="photo.jpg" -->
+      <div class="img-placeholder">
+        <div class="cat-icon">🐱</div>
+        <span>Replace with your photo</span>
+        <code style="font-size:0.6rem; opacity:0.6;">src="photo.jpg"</code>
+      </div>
+      <!-- UNCOMMENT & update src when you have a photo:
+      <img class="img-placeholder-real" src="photo.jpg" alt="Spinning Cat Speaker" />
+      -->
+    </div>
+
+    <div class="media-card">
+      <div class="media-label">▶ &nbsp;Video 1 — Demo</div>
+      <div class="video-wrap">
+        <!-- OPTION A: Local video file -->
+        <video controls>
+          <source src="videos/video1.mp4" type="video/mp4">
+          Your browser does not support video.
+        </video>
+        <!-- OPTION B: YouTube embed — uncomment and replace VIDEO_ID
+        <iframe src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe>
+        -->
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM MEDIA: Video 2 + PDF -->
+  <div class="media-bottom fade-in">
+    <div class="media-card">
+      <div class="media-label">▶ &nbsp;Video 2 — Build Process</div>
+      <div class="video-wrap">
+        <video controls>
+          <source src="videos/video2.mp4" type="video/mp4">
+          Your browser does not support video.
+        </video>
+        <!-- OPTION B: YouTube embed — uncomment and replace VIDEO_ID
+        <iframe src="https://www.youtube.com/embed/VIDEO_ID" allowfullscreen></iframe>
+        -->
+      </div>
+    </div>
+
+    <div class="media-card">
+      <div class="media-label">📄 &nbsp;Project Report</div>
+      <div class="pdf-wrap">
+        <!-- Replace report.pdf with your actual filename -->
+        <iframe src="report.pdf" title="Project Report">
+          <div class="pdf-fallback">
+            <div class="pdf-icon">📑</div>
+            <span>PDF preview not supported</span>
+            <a href="report.pdf" class="download-btn" download>⬇ Download Report</a>
+          </div>
+        </iframe>
+      </div>
+      <div style="padding:14px 18px; border-top: 1px solid var(--border);">
+        <a href="report.pdf" class="download-btn" download>⬇ Download Full Report</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- REST OF CONTENT -->
+  <div class="content">
+    <div class="divider"></div>
+
+    <!-- OVERVIEW -->
+    <div class="fade-in">
+      <div class="section-header">
+        <span class="section-num">01 —</span>
+        <h2>Overview</h2>
+      </div>
+      <p>
+        The Spinning Cat Speaker is a custom-built embedded audio system that plays music while driving a DC motor to spin a 3D-printed cat figurine in sync with the beat. An RGB LED ring mounted on the assembly pulses with the music for a visual effect that complements the audio.
+      </p>
+      <p>
+        The system is powered via a 5V USB connection and streams audio and motor movement data concurrently from a microSD card. Physical buttons allow the user to cycle through tracks, control playback, and trigger LED effects.
+      </p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- FEATURES -->
+    <div class="fade-in">
+      <div class="section-header">
+        <span class="section-num">02 —</span>
+        <h2>Features</h2>
+      </div>
+      <div class="features">
+        <div class="feature-item"><div class="feature-dot"></div><div class="feature-text">Music playback from microSD card over I2S to a Class D amplifier</div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div class="feature-text">Motor speed and direction synchronized to music rhythm</div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div class="feature-text">35-LED WS2812 RGB ring with programmable lighting effects</div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div class="feature-text">Microphone input for audio-reactive modes</div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div class="feature-text">8-button interface: Play/Pause, Volume Up/Down, Next, Previous, LED Trigger, Mic Trigger</div></div>
+        <div class="feature-item"><div class="feature-dot"></div><div class="feature-text">5V USB powered — single connection for the entire system</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ARCHITECTURE -->
+    <div class="fade-in">
+      <div class="section-header">
+        <span class="section-num">03 —</span>
+        <h2>System Architecture</h2>
+      </div>
+      <p>The system is built around two microcontrollers working in tandem over UART:</p>
+
+      <div class="arch-cols">
+        <div class="arch-card">
+          <h3>ESP32 — Main Compute</h3>
+          <p>Handles audio decoding and playback, microSD streaming via SPI, I2S audio output to the amplifier and input from the microphone, button input handling, and UART communication to the peripheral controller.</p>
+        </div>
+        <div class="arch-card">
+          <h3>MSPM0G3507 — Peripheral Control</h3>
+          <p>Receives commands from the ESP32 over UART and drives the motor via PWM/GPIO to the L298N motor driver, and controls the WS2812 LED ring over a 1-wire interface.</p>
+        </div>
+      </div>
+
+      <!-- System Diagram -->
+      <h3>System Diagram</h3>
+      <div class="diagram-card">
+        <!-- Replace system_diagram.jpg with your actual file -->
+        <img src="system_diagram.jpg" alt="System Diagram"
+          onerror="this.parentElement.innerHTML='<div class=\'diagram-placeholder\'>[ Replace with system_diagram.jpg ]</div>'" />
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- COMPONENT TABLE -->
+    <div class="fade-in">
+      <div class="section-header">
+        <span class="section-num">04 —</span>
+        <h2>Component Summary</h2>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>ESP32</td><td>Main compute: audio, SD, buttons, UART</td></tr>
+            <tr><td>MSPM0G3507</td><td>Peripheral control: motor, LEDs</td></tr>
+            <tr><td>ADA254 (microSD Breakout)</td><td>Music and movement file storage (SPI)</td></tr>
+            <tr><td>ICS-43434</td><td>MEMS microphone (I2S)</td></tr>
+            <tr><td>MAX98357A</td><td>I2S Class D amplifier</td></tr>
+            <tr><td>EK1725 (2"–3", 4Ω, 3W)</td><td>Speaker</td></tr>
+            <tr><td>L298N</td><td>DC motor driver (PWM + GPIO direction)</td></tr>
+            <tr><td>DC Motor</td><td>Spins the cat</td></tr>
+            <tr><td>35× WS2812 5050 LED Ring</td><td>RGB lighting effects (1-wire)</td></tr>
+            <tr><td>8 Buttons</td><td>User input (GPIO with pull-ups)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- POWER -->
+    <div class="fade-in">
+      <div class="section-header">
+        <span class="section-num">05 —</span>
+        <h2>Power</h2>
+      </div>
+      <div class="power-badge">
+        <span class="power-icon">⚡</span>
+        <span>Entire system powered from a single 5V USB connection</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-names">
+      <span>Katherine Han</span>
+      <span>Evan Ho</span>
+      <span>Hajime Kioi</span>
+      <span>Winson Lin</span>
+    </div>
+    <span>Spinning Cat Speaker &nbsp;·&nbsp; ECE Senior Design</span>
+  </footer>
+
+  <script>
+    // Scroll fade-in
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
